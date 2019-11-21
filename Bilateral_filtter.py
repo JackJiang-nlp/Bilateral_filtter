@@ -1,3 +1,4 @@
+
 """
 在运行代码前查看readme.txt文件，查看程序运行的环境
 """
@@ -11,12 +12,10 @@ import send_mail
 # from mpl_toolkits.mplot3d import Axes3D
 # %%
 PI = 3.14
-run_time = time.time()
-
-
 class Filter:
     def __init__(self, image_path, output_path, r, sigma_d, sigma_r):
         self.image = cv2.imread(image_path)
+        self.change_image=cv2.imread(image_path)
         self.nchannels=None
         num_channels=len(self.image.shape)
         if num_channels==3:
@@ -66,11 +65,11 @@ class Filter:
         Dker_s = self.value_ker(index_x=index_x, index_y=index_y)
         final_ker = np.exp(Dker_s+self.Sker)
         if self.nchannels is None:
-            self.image[index_x, index_y] = (self.image[index_x-self.r:index_x+self.r+1,
+            self.change_image[index_x, index_y] = (self.image[index_x-self.r:index_x+self.r+1,
                                         index_y-self.r:index_y+self.r+1]*final_ker).sum(
                                       axis=0).sum(axis=0)/(final_ker.sum(axis=0).sum(axis=0))
         else:
-            self.image[index_x, index_y, :] = (self.image[index_x-self.r:index_x+self.r+1,
+            self.change_image[index_x, index_y, :] = (self.image[index_x-self.r:index_x+self.r+1,
                                         index_y-self.r:index_y+self.r+1, :]*final_ker).sum(
                                       axis=0).sum(axis=0)/(final_ker.sum(axis=0).sum(axis=0))
 
@@ -79,7 +78,7 @@ class Filter:
         for i in range(self.r, self.rows-self.r):
             for j in range(self.r, self.cols-self.r):
                 self.bilateral_filtter(i, j)
-        cv2.imwrite(self.output_path, self.image)
+        cv2.imwrite(self.output_path, self.change_image)
         return self.image
 
 # %%
@@ -110,14 +109,15 @@ class Filter:
 
 # %%
 if __name__ == "__main__":
+    run_time = time.time()
     image_path = "./images/Circuit_noise.jpg"
     half_width = 2
-    sigmaD = 400
-    sigmaR = 150
+    sigmaD = 200
+    sigmaR = 80
     output_path = "./output1_image/{}_{}_{}.jpg".format(half_width,sigmaD,sigmaR)
     filter = Filter(image_path, output_path, half_width, sigmaD, sigmaR)
     out_img = filter.Conv_fun()
-    # cv2.imshow('shdk',out_img)
+    # cv2.imshow('image',out_img)
     # cv2.waitKey(0)
     # for half_width in range(1,3): 
     #     for sigmaD in np.linspace(310,600,30):
